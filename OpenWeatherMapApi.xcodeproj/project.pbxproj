@@ -7,10 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		980F6A9C1E65E87B00B06718 /* OpenWeatherMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 980F6A9B1E65E87B00B06718 /* OpenWeatherMap.swift */; };
+		980F6A9E1E6602D600B06718 /* WeatherResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 980F6A9D1E6602D600B06718 /* WeatherResponse.swift */; };
 		98A2CA281E65E3D30099EB2F /* OpenWeatherMapApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 98A2CA261E65E3D30099EB2F /* OpenWeatherMapApi.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		980F6A9B1E65E87B00B06718 /* OpenWeatherMap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenWeatherMap.swift; sourceTree = "<group>"; };
+		980F6A9D1E6602D600B06718 /* WeatherResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WeatherResponse.swift; sourceTree = "<group>"; };
 		98A2CA231E65E3D30099EB2F /* OpenWeatherMapApi.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OpenWeatherMapApi.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		98A2CA261E65E3D30099EB2F /* OpenWeatherMapApi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenWeatherMapApi.h; sourceTree = "<group>"; };
 		98A2CA271E65E3D30099EB2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -48,6 +52,8 @@
 			children = (
 				98A2CA261E65E3D30099EB2F /* OpenWeatherMapApi.h */,
 				98A2CA271E65E3D30099EB2F /* Info.plist */,
+				980F6A9B1E65E87B00B06718 /* OpenWeatherMap.swift */,
+				980F6A9D1E6602D600B06718 /* WeatherResponse.swift */,
 			);
 			path = OpenWeatherMapApi;
 			sourceTree = "<group>";
@@ -96,6 +102,7 @@
 					98A2CA221E65E3D30099EB2F = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = GY744476KY;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -132,6 +139,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				980F6A9C1E65E87B00B06718 /* OpenWeatherMap.swift in Sources */,
+				980F6A9E1E6602D600B06718 /* WeatherResponse.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -240,6 +249,7 @@
 		98A2CA2C1E65E3D30099EB2F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = GY744476KY;
@@ -252,6 +262,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ghengiskwan.OpenWeatherMapApi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -259,6 +270,7 @@
 		98A2CA2D1E65E3D30099EB2F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = GY744476KY;
@@ -294,6 +306,7 @@
 				98A2CA2D1E65E3D30099EB2F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
