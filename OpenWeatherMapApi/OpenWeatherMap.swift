@@ -36,66 +36,67 @@ public class OpenWeatherMap {
             pendingQuery?.cancel()
         }
 
-        var qVal = city
-        if let country = country {
-            qVal.append(",\(country)")
-        }
-
-        guard let initialUrl = URL(string: API_URL_STR)?.appendingPathComponent("weather") else {
-            throw OpenWeatherMapError.failure("Failed to create initial URL")
-        }
-        
-        guard var urlComponents = URLComponents(url: initialUrl, resolvingAgainstBaseURL: false) else {
-            throw OpenWeatherMapError.failure("Failed to create Query")
-        }
-
-        urlComponents.queryItems = [
-            URLQueryItem(name:"q", value:qVal),
-            URLQueryItem(name: "type", value: "like"),
-            URLQueryItem(name: "appid", value: API_KEY)
-        ]
-        
-        guard let url = urlComponents.url else {
-            throw OpenWeatherMapError.failure("Failed to create final url.")
-        }
-        
-//        // Use sample until account issue is resolved
-//        guard let url = URL(string: SAMPLE_URL_STR) else {
-//            // TODO: THRow error or find a way to silent fail
-//            return
+//        var qVal = city
+//        if let country = country {
+//            qVal.append(",\(country)")
 //        }
+//
+//        guard let initialUrl = URL(string: API_URL_STR)?.appendingPathComponent("weather") else {
+//            throw OpenWeatherMapError.failure("Failed to create initial URL")
+//        }
+//        
+//        guard var urlComponents = URLComponents(url: initialUrl, resolvingAgainstBaseURL: false) else {
+//            throw OpenWeatherMapError.failure("Failed to create Query")
+//        }
+//
+//        urlComponents.queryItems = [
+//            URLQueryItem(name:"q", value:qVal),
+//            URLQueryItem(name: "type", value: "like"),
+//            URLQueryItem(name: "appid", value: API_KEY)
+//        ]
+//        
+//        guard let url = urlComponents.url else {
+//            throw OpenWeatherMapError.failure("Failed to create final url.")
+//        }
+        
+        // Use sample until account issue is resolved
+        guard let url = URL(string: SAMPLE_URL_STR) else {
+            throw OpenWeatherMapError.failure("Failed to use sample url.")
+        }
         
         pendingQuery = aSession.dataTask(with: url, completionHandler: { (data, response, error) in
             self.pendingQuery = nil
-            guard error?.localizedDescription == nil else {
-                self.delegate?.failedToQueryWeather(response:response, error:error, otherMsg:nil)
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Not an HTTP response.")
-                return
-            }
-            
-            guard httpResponse.statusCode == 200 else {
-                self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Query Failed StatusCode[\(httpResponse.statusCode)]")
-                return
-            }
-            
-            guard let data = data else {
-                self.delegate? .failedToQueryWeather(response: response, error: error, otherMsg: "No errors, but no data in response.")
-                return
-            }
-
-            let dataStr = String(data: data, encoding: .utf8)
-            print("Response - \(dataStr)")
-            
-            if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers), let json = jsonObject as? [String: Any] {
+            OperationQueue.main.addOperation {
+                guard error?.localizedDescription == nil else {
+                    self.delegate?.failedToQueryWeather(response:response, error:error, otherMsg:nil)
+                    return
+                }
                 
-                let weather = WeatherResponse(json: json)
-                self.delegate?.hasWeatherData(weather : weather)
-            } else {
-                self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Failed to convert response to json dictionary. Data [\(dataStr)]")
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Not an HTTP response.")
+                    return
+                }
+                
+                guard httpResponse.statusCode == 200 else {
+                    self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Query Failed StatusCode[\(httpResponse.statusCode)]")
+                    return
+                }
+                
+                guard let data = data else {
+                    self.delegate? .failedToQueryWeather(response: response, error: error, otherMsg: "No errors, but no data in response.")
+                    return
+                }
+                
+                let dataStr = String(data: data, encoding: .utf8)
+                print("Response - \(dataStr)")
+                
+                if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers), let json = jsonObject as? [String: Any] {
+                    
+                    let weather = WeatherResponse(json: json)
+                    self.delegate?.hasWeatherData(weather : weather)
+                } else {
+                    self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Failed to convert response to json dictionary. Data [\(dataStr)]")
+                }                
             }
         })
         pendingQuery?.resume()
