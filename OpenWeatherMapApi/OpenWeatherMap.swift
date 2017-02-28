@@ -7,9 +7,10 @@
 //
 
 import Foundation
+import Gloss
 
 public protocol OpenWeatherMapDelegate {
-    func hasWeatherData(responseJson : [String:Any])
+    func hasWeatherData(weather : WeatherResponse)
     func failedToQueryWeather(response: URLResponse?, error:Error?, otherMsg : String?)
 }
 
@@ -89,7 +90,9 @@ public class OpenWeatherMap {
             print("Response - \(dataStr)")
             
             if let jsonObject = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers), let json = jsonObject as? [String: Any] {
-                    self.delegate?.hasWeatherData(responseJson: json)
+                
+                let weather = WeatherResponse(json: json)
+                self.delegate?.hasWeatherData(weather : weather)
             } else {
                 self.delegate?.failedToQueryWeather(response: response, error: error, otherMsg: "Failed to convert response to json dictionary. Data [\(dataStr)]")
             }
