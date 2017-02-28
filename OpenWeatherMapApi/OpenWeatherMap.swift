@@ -12,6 +12,8 @@ import Gloss
 public protocol OpenWeatherMapDelegate {
     func hasWeatherData(weather : WeatherResponse)
     func failedToQueryWeather(response: URLResponse?, error:Error?, otherMsg : String?)
+    func hasThumbnailData(image : UIImage, id : String)
+    func failedToGetThumbnail(response: URLResponse?, error:Error?, otherMsg : String?)
 }
 
 public enum OpenWeatherMapError : Error {
@@ -28,8 +30,52 @@ public class OpenWeatherMap {
     
     private let aSession = URLSession(configuration: URLSessionConfiguration.default)
     private var pendingQuery : URLSessionDataTask?
+    private var pendingThumbnailRequest : URLSessionDataTask?
     
     public init() {}
+    
+    public func getThumnail(id : String) throws {
+        if pendingThumbnailRequest != nil {
+            pendingThumbnailRequest?.cancel()
+        }
+        
+        guard let url = URL(string:"http://openweathermap.org/img/w/\(id).png") else {
+            throw OpenWeatherMapError.failure("Failed to construct thumbnail url")
+        }
+        
+        pendingThumbnailRequest = aSession.dataTask(with: url, completionHandler: { (data, response, error) in
+            self.pendingThumbnailRequest = nil
+            OperationQueue.main.addOperation {
+                guard error?.localizedDescription == nil else {
+                    self.delegate?.failedToGetThumbnail(response:response, error:error, otherMsg:nil)
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    self.delegate?.failedToGetThumbnail(response: response, error: error, otherMsg: "Not an HTTP response.")
+                    return
+                }
+                
+                guard httpResponse.statusCode == 200 else {
+                    self.delegate?.failedToGetThumbnail(response: response, error: error, otherMsg: "Query Failed StatusCode[\(httpResponse.statusCode)]")
+                    return
+                }
+                
+                guard let data = data else {
+                    self.delegate? .failedToGetThumbnail(response: response, error: error, otherMsg: "No errors, but no data in response.")
+                    return
+                }
+
+                if let image = UIImage(data: data) {
+                    self.delegate?.hasThumbnailData(image: image, id: id)
+                } else {
+                    self.delegate?.failedToGetThumbnail(response: response, error: error, otherMsg: "Failed to create Image")
+                }
+                
+            }
+        })
+        pendingThumbnailRequest?.resume()
+    }
     
     public func getWeather(for city:String, and country:String?=nil) throws {
         if pendingQuery != nil {

@@ -11,7 +11,7 @@ import Gloss
 
 public class WeatherResponse : Decodable, CustomStringConvertible {
     let coord : CoordinateResponse?
-    let weathers : [WeatherItemResponse]?
+    public let weathers : [WeatherItemResponse]?
     let base : String?
     let main : MainResponse?
     let visibility : Decimal?
@@ -112,7 +112,7 @@ public class WeatherItemResponse : Decodable, CustomStringConvertible {
     let id : Decimal?
     let main : String?
     let desc : String?
-    let icon : String?
+    public let icon : String?
     
     public required init?(json:JSON){
         self.id = "id" <~~ json
