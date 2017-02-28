@@ -21,7 +21,7 @@ public enum OpenWeatherMapError : Error {
 }
 
 public class OpenWeatherMap {
-    private let API_KEY = "06cf96d89506f8e57b7a730849994ed5" // TODO: Provide initializer for user supplied
+    private let apiKey : String?
     private let API_URL_STR = "http://api.openweathermap.org/data/2.5/" //TODO: Provide intializer for user supplied
     
     private let SAMPLE_URL_STR = "http://samples.openweathermap.org/data/2.5/weather?q=London&appid=b1b15e88fa797225412429c1c50c122a1"
@@ -32,7 +32,9 @@ public class OpenWeatherMap {
     private var pendingQuery : URLSessionDataTask?
     private var pendingThumbnailRequest : URLSessionDataTask?
     
-    public init() {}
+    public init(apiKey : String?) {
+        self.apiKey = apiKey
+    }
     
     public func getThumnail(id : String) throws {
         if pendingThumbnailRequest != nil {
@@ -82,35 +84,41 @@ public class OpenWeatherMap {
             pendingQuery?.cancel()
         }
 
-//        var qVal = city
-//        if let country = country {
-//            qVal.append(",\(country)")
-//        }
-//
-//        guard let initialUrl = URL(string: API_URL_STR)?.appendingPathComponent("weather") else {
-//            throw OpenWeatherMapError.failure("Failed to create initial URL")
-//        }
-//        
-//        guard var urlComponents = URLComponents(url: initialUrl, resolvingAgainstBaseURL: false) else {
-//            throw OpenWeatherMapError.failure("Failed to create Query")
-//        }
-//
-//        urlComponents.queryItems = [
-//            URLQueryItem(name:"q", value:qVal),
-//            URLQueryItem(name: "type", value: "like"),
-//            URLQueryItem(name: "appid", value: API_KEY)
-//        ]
-//        
-//        guard let url = urlComponents.url else {
-//            throw OpenWeatherMapError.failure("Failed to create final url.")
-//        }
-        
-        // Use sample until account issue is resolved
-        guard let url = URL(string: SAMPLE_URL_STR) else {
-            throw OpenWeatherMapError.failure("Failed to use sample url.")
+        var finalUrl : URL!
+        if let apiKey = apiKey {
+            var qVal = city
+            if let country = country {
+                qVal.append(",\(country)")
+            }
+    
+            guard let initialUrl = URL(string: API_URL_STR)?.appendingPathComponent("weather") else {
+                throw OpenWeatherMapError.failure("Failed to create initial URL")
+            }
+    
+            guard var urlComponents = URLComponents(url: initialUrl, resolvingAgainstBaseURL: false) else {
+                throw OpenWeatherMapError.failure("Failed to create Query")
+            }
+    
+            urlComponents.queryItems = [
+                URLQueryItem(name:"q", value:qVal),
+                URLQueryItem(name: "type", value: "like"),
+                URLQueryItem(name: "appid", value: apiKey)
+            ]
+            
+            guard let url = urlComponents.url else {
+                throw OpenWeatherMapError.failure("Failed to create final url.")
+            }
+            finalUrl = url
+        } else {
+            guard let url = URL(string: SAMPLE_URL_STR) else {
+                throw OpenWeatherMapError.failure("Failed to use sample url.")
+            }
+            finalUrl = url
         }
         
-        pendingQuery = aSession.dataTask(with: url, completionHandler: { (data, response, error) in
+        print("Using URL - \(finalUrl.absoluteString)")
+        
+        pendingQuery = aSession.dataTask(with: finalUrl, completionHandler: { (data, response, error) in
             self.pendingQuery = nil
             OperationQueue.main.addOperation {
                 guard error?.localizedDescription == nil else {
